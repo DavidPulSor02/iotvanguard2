@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Historial de Actividad</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item *ngFor="let log of activityLog">
+      <ion-label>
+        <h2>RFID: {{ log.rfid }}</h2>
+        <p>Estado: <strong
+            [ngClass]="{ 'permitido': log.status === 'Permitido', 'denegado': log.status === 'Denegado' }">{{ log.status
+            }}</strong></p>
+        <p>Hora: {{ log.time }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>

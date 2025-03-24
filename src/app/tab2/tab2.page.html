@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Control de Componentes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <div class="card">
+      <div class="icon">
+        <ion-icon name="lock-closed-outline" *ngIf="!puertaAbierta"></ion-icon>
+        <ion-icon name="lock-open-outline" *ngIf="puertaAbierta"></ion-icon>
+      </div>
+      <h2>Puerta</h2>
+      <p>1 dispositivo</p>
+      <div class="switch-container">
+        <span>{{ puertaAbierta ? 'ON' : 'OFF' }}</span>
+        <ion-toggle [(ngModel)]="puertaAbierta" (ionChange)="togglePuerta()"></ion-toggle>
+      </div>
+    </div>
+  </div>
+</ion-content>

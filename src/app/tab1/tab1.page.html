@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Control de Puerta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Mostrar el valor del sensor -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Sensor de Puerta</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Valor del sensor:</strong> {{ sensorValue }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Mostrar y cambiar el estado de la puerta -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Estado de la Puerta</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Estado actual:</strong> <span [ngClass]="puertaEstado === 'Abierto' ? 'abierto' : 'cerrado'">{{
+          puertaEstado }}</span></p>
+
+      <ion-button expand="full" color="primary" (click)="togglePuerta()">
+        {{ puertaEstado === 'Abierto' ? 'Cerrar Puerta' : 'Abrir Puerta' }}
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

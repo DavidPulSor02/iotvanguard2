@@ -1,0 +1,50 @@
+:host {
+    --background: #0d1117;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.card {
+    width: 180px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.icon ion-icon {
+    font-size: 40px;
+    color: #00bcd4;
+}
+
+h2 {
+    margin: 10px 0 5px;
+    font-size: 18px;
+}
+
+p {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+ion-toggle {
+    --background: rgba(255, 255, 255, 0.2);
+    --background-checked: linear-gradient(45deg, #00bcd4, #0073e6);
+    --handle-background: white;
+    --handle-background-checked: white;
+}
