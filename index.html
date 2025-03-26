@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Control</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Vanguard</h2>
+        <ul>
+            <li class="active"><a href="index.html">Dashboard</a></li>
+            <li><a href="historial.html">Historial</a></li>
+            <li><a href="configuracion.html">Configuración</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="navbar">
+            <div class="navbar-left">
+                <span class="dashboard-title">Dashboard</span>
+                <input type="text" placeholder="Buscar..." class="search-bar" />
+            </div>
+            <div class="navbar-right">
+                <button class="icon-btn">?</button>
+                <button class="icon-btn">🔔</button>
+                <div class="user-info">
+                    <div class="avatar"></div>
+                    <span>David</span>
+                </div>
+            </div>
+        </div>
+
+        <header>
+            <h1>Panel de Control</h1>
+        </header>
+
+        <section class="cards">
+            <div class="card">
+                <h3>LED</h3>
+                <label class="switch">
+                    <input type="checkbox" id="led-toggle" />
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="card">
+                <h3>Puerta</h3>
+                <label class="switch">
+                    <input type="checkbox" id="door-toggle" />
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </section>
+
+        <section class="status-log">
+            <section class="ingreso-info">
+                <h2>Último Ingreso</h2>
+                <div class="persona-box" id="persona-box">  
+                    <img id="persona-foto" src="" alt="Foto del usuario" />
+                    <div>
+                        <p><strong>Nombre:</strong> <span id="persona-nombre">---</span></p>
+                        <p><strong>Rol:</strong> <span id="persona-rol">---</span></p>
+                        <p><strong>Hora:</strong> <span id="persona-hora">---</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <h2>Estado Actual</h2>
+            <div id="status-output">
+                LED: <span id="led-status">...</span> |
+                Puerta: <span id="door-status">...</span>
+            </div>
+        </section>
+
+        <section class="chart-section">
+            <h2>Actividad del Circuito</h2>
+            <canvas id="activityChart" width="600" height="300"></canvas>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ledToggle = document.getElementById('led-toggle');
+        const doorToggle = document.getElementById('door-toggle');
+        const ledStatus = document.getElementById('led-status');
+        const doorStatus = document.getElementById('door-status');
+
+        async function cargarEstado() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                ledToggle.checked = data.led;
+                ledStatus.textContent = data.led ? 'Encendido' : 'Apagado';
+
+                const puertaAbierta = data.door === 'open';
+                doorToggle.checked = puertaAbierta;
+                doorStatus.textContent = puertaAbierta ? 'Abierta' : 'Cerrada';
+            } catch (err) {
+                console.error('Error al cargar estado:', err);
+            }
+        }
+
+        async function cargarUltimoIngreso() {
+            try {
+                const res = await fetch('/api/ultimo-ingreso');
+                const data = await res.json();
+
+                document.getElementById('persona-nombre').textContent = data.nombre || '---';
+                document.getElementById('persona-rol').textContent = data.rol || '---';
+                document.getElementById('persona-hora').textContent = data.ingreso
+                    ? new Date(data.ingreso).toLocaleTimeString()
+                    : '---';
+                document.getElementById('persona-foto').src = data.foto || '';
+            } catch (err) {
+                console.error('Error al cargar último ingreso:', err);
+            }
+        }
+
+        ledToggle.addEventListener('change', async () => {
+            const led = ledToggle.checked;
+            await fetch('/api/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ led })
+            });
+            ledStatus.textContent = led ? 'Encendido' : 'Apagado';
+            await cargarGrafica();
+        });
+
+        doorToggle.addEventListener('change', async () => {
+            const door = doorToggle.checked ? 'open' : 'closed';
+            await fetch('/api/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ door })
+            });
+            doorStatus.textContent = door === 'open' ? 'Abierta' : 'Cerrada';
+            await cargarGrafica();
+        });
+
+        // Ejecutar al cargar
+        cargarEstado();
+        cargarUltimoIngreso();
+        setInterval(cargarUltimoIngreso, 5000);
+    </script>
+
+    <script>
+        let activityChart;
+
+        async function cargarGrafica() {
+            const res = await fetch('/api/actividad');
+            const { labels, data } = await res.json();
+            const ctx = document.getElementById('activityChart').getContext('2d');
+
+            if (activityChart) {
+                activityChart.data.labels = labels;
+                activityChart.data.datasets[0].data = data;
+                activityChart.update();
+            } else {
+                activityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Eventos',
+                            data,
+                            backgroundColor: 'rgba(102, 178, 255, 0.6)',
+                            borderColor: 'rgba(102, 178, 255, 1)',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: '#444' } },
+                            x: { ticks: { color: '#fff' }, grid: { color: '#444' } }
+                        },
+                        plugins: { legend: { labels: { color: '#fff' } } }
+                    }
+                });
+            }
+        }
+
+        cargarGrafica();
+    </script>
+</body>
+
+</html>

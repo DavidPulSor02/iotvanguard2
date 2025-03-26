@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Vanguard</h2>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li class="active">Historial</li>
+            <li><a href="configuracion.html">Configuración</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Historial de Actividad</h1>
+        </header>
+
+        <section class="log-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Evento</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="historial-body">
+                    <!-- Aquí se insertan dinámicamente los datos -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        async function cargarHistorial() {
+            const res = await fetch('/api/historial');
+            const data = await res.json();
+            const body = document.getElementById('historial-body');
+            body.innerHTML = data.map(row => `
+        <tr>
+          <td>${row.date}</td>
+          <td>${row.time}</td>
+          <td>${row.event}</td>
+          <td>${row.value}</td>
+        </tr>
+      `).join('');
+        }
+
+        cargarHistorial();
+    </script>
+</body>
+
+</html>
