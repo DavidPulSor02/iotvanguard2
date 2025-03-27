@@ -21,6 +21,10 @@
     <div class="main-content">
         <header>
             <h1>Historial de Actividad</h1>
+            <div class="controls">
+                <button id="refresh-btn">Actualizar</button>
+                <span id="last-updated"></span>
+            </div>
         </header>
 
         <section class="log-table">
@@ -29,6 +33,7 @@
                     <tr>
                         <th>Fecha</th>
                         <th>Hora</th>
+                        <th>UID</th>
                         <th>Evento</th>
                         <th>Estado</th>
                     </tr>
@@ -42,20 +47,40 @@
 
     <script>
         async function cargarHistorial() {
-            const res = await fetch('/api/historial');
-            const data = await res.json();
-            const body = document.getElementById('historial-body');
-            body.innerHTML = data.map(row => `
-        <tr>
-          <td>${row.date}</td>
-          <td>${row.time}</td>
-          <td>${row.event}</td>
-          <td>${row.value}</td>
-        </tr>
-      `).join('');
+            try {
+                const res = await fetch('/api/historial');
+                if (!res.ok) throw new Error('Error al cargar historial');
+
+                const data = await res.json();
+                const body = document.getElementById('historial-body');
+
+                body.innerHTML = data.map(row => `
+                    <tr>
+                        <td>${row.date}</td>
+                        <td>${row.time}</td>
+                        <td class="uid">${row.uid || 'N/A'}</td>
+                        <td>${row.event}</td>
+                        <td class="status ${row.value.toLowerCase()}">${row.value}</td>
+                    </tr>
+                `).join('');
+
+                // Actualizar última actualización
+                document.getElementById('last-updated').textContent =
+                    `Última actualización: ${new Date().toLocaleTimeString()}`;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el historial');
+            }
         }
 
+        // Cargar inicialmente
         cargarHistorial();
+
+        // Actualizar cada 30 segundos
+        setInterval(cargarHistorial, 30000);
+
+        // Manejar botón de actualización
+        document.getElementById('refresh-btn').addEventListener('click', cargarHistorial);
     </script>
 </body>
 
