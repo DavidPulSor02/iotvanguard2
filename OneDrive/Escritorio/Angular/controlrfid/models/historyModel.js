@@ -1,13 +1,12 @@
-// models/historyModel.js
-module.exports = {
-    history: [
-        // Ejemplo de estructura inicial
-        {
-            date: '01/01/2023',
-            time: '12:00:00',
-            event: 'Sistema iniciado',
-            value: 'OK',
-            uid: 'Sistema'
-        }
-    ]
-};
+const mongoose = require('mongoose');
+
+const historySchema = new mongoose.Schema({
+    date: { type: String, required: true },
+    time: { type: String, required: true },
+    event: { type: String, required: true },
+    value: { type: String, required: true },
+    uid: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('History', historySchema);
